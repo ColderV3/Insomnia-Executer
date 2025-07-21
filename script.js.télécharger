@@ -1,0 +1,172 @@
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile menu functionality
+  const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+  const mobileMenu = document.querySelector('.mobile-menu');
+  const body = document.body;
+  
+  if (mobileMenuToggle && mobileMenu) {
+    mobileMenuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+      body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+      mobileMenuToggle.innerHTML = mobileMenu.classList.contains('active') ? 
+        '<i class="fas fa-times"></i>' : 
+        '<i class="fas fa-bars"></i>';
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (mobileMenu.classList.contains('active') && 
+          !mobileMenu.contains(e.target) && 
+          !mobileMenuToggle.contains(e.target)) {
+        mobileMenu.classList.remove('active');
+        body.style.overflow = '';
+        mobileMenuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    });
+
+    // Close mobile menu when clicking a link
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        body.style.overflow = '';
+        mobileMenuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+      });
+    });
+  }
+
+  // Add specific handling for the preview button
+  const previewButton = document.querySelector('.preview-info .btn-primary');
+  if (previewButton) {
+    previewButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      const downloadSection = document.querySelector('#download');
+      if (downloadSection) {
+        window.scrollTo({
+          top: downloadSection.offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    });
+  }
+  
+  // Smooth scroll for navigation links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const hrefValue = this.getAttribute('href');
+      
+      // Skip empty href values
+      if (!hrefValue || hrefValue === '#') return;
+      
+      const target = document.querySelector(hrefValue);
+      
+      if (target) {
+        window.scrollTo({
+          top: target.offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Parallax effect for gradient backgrounds
+  document.addEventListener('mousemove', (e) => {
+    const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
+    const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
+    
+    document.querySelectorAll('.gradient-circle').forEach(circle => {
+      const speed = circle.dataset.speed || 0.05;
+      circle.style.transform = `translate(${moveX * speed}px, ${moveY * speed}px)`;
+    });
+  });
+  
+  // Scroll animations
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('fadeIn');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+  
+  const animateElements = document.querySelectorAll('.section-header, .feature-card, .pricing-plan, .server-card, .download-card, .preview-image, .preview-feature');
+  
+  animateElements.forEach(element => {
+    observer.observe(element);
+  });
+  
+  // Header scroll effect
+  const header = document.querySelector('header');
+  
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.style.background = 'rgba(0, 0, 0, 0.8)';
+      header.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+    } else {
+      header.style.background = 'rgba(0, 0, 0, 0.5)';
+      header.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+    }
+  });
+  
+  // Pricing plan hover effects
+  document.querySelectorAll('.pricing-plan').forEach(plan => {
+    plan.addEventListener('mouseenter', () => {
+      if (!plan.classList.contains('premium')) {
+        plan.style.transform = 'translateY(-10px)';
+      } else {
+        plan.style.transform = 'scale(1.05) translateY(-10px)';
+      }
+      plan.style.borderColor = 'var(--primary)';
+      plan.style.boxShadow = 'var(--shadow-lg)';
+    });
+    
+    plan.addEventListener('mouseleave', () => {
+      if (!plan.classList.contains('premium')) {
+        plan.style.transform = '';
+      } else {
+        plan.style.transform = 'scale(1.05)';
+      }
+      plan.style.borderColor = plan.classList.contains('premium') ? 'rgba(121, 40, 202, 0.3)' : '';
+      plan.style.boxShadow = '';
+    });
+  });
+  
+  // Feature card hover animation
+  document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      const icon = card.querySelector('.feature-icon');
+      icon.style.background = 'var(--primary)';
+      icon.style.color = 'white';
+      icon.style.transform = 'scale(1.1)';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      const icon = card.querySelector('.feature-icon');
+      icon.style.background = 'rgba(121, 40, 202, 0.1)';
+      icon.style.color = 'var(--primary)';
+      icon.style.transform = '';
+    });
+  });
+
+  // Add pulse animation to coming soon badges
+  const comingSoonBadges = document.querySelectorAll('.coming-soon-badge');
+  comingSoonBadges.forEach(badge => {
+    // Skip animation for internal executor badges
+    if (badge.textContent.includes('COMING SOON')) {
+      return;
+    }
+    setInterval(() => {
+      badge.style.opacity = '0.7';
+      setTimeout(() => {
+        badge.style.opacity = '1';
+      }, 800);
+    }, 1600);
+  });
+});
